@@ -148,7 +148,7 @@ col2.metric(
 
 col3.metric(
     "Median Final Balance",
-    f"${median_at_retirement:,.0f}",
+    f"${median_final:,.0f}",
     help="Median savings balance at end of retirement",
 )
 
