@@ -1,6 +1,7 @@
 import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
+import yfinance as yf
 
 from simulation import get_market_params, run_simulation
 
@@ -9,6 +10,31 @@ st.title("Monte Carlo Retirement Simulator")
 st.caption("Simulates 10,000 retirement savings paths using real market data.")
 
 st.sidebar.header("Parameters")
+
+search_query = st.sidebar.text_input(
+    "Search for a stock", value="S&P 500", placeholder="Apple, Tesla, SPY..."
+)
+
+@st.cache_data
+def search_tickers(query):
+    results = yf.Search(query, max_results=6).quotes
+    options = [
+        f"{r['symbol']} - {r.get('shortname', r.get('longname', 'Unknown'))}"
+        for r in results
+        if "symbol" in r
+    ]
+    return options
+
+options = search_tickers(search_query)
+
+if not options:
+    st.sidebar.warning('No results found. Please try a different search.')
+    st.stop()
+
+selected = st.sidebar.selectbox('Select ticker', options=options)
+
+ticker = selected.split(' - ')[0].strip()
+
 
 starting_balance = st.sidebar.slider(
     "Starting Balance ($)",
@@ -47,15 +73,18 @@ annual_withdrawal = st.sidebar.slider(
 
 
 @st.cache_data
-def load_params():
-    return get_market_params("SPY", start="2000-01-01")
+def load_params(ticker='SPY'):
+    return get_market_params(f'{ticker}', start="2000-01-01")
+
+with st.spinner(f'Loading data for {ticker}...'):
+    mu, sigma = load_params(ticker)
 
 
-mu, sigma = load_params()
+mu, sigma = load_params(ticker)
 
 st.sidebar.markdown("---")
 
-st.sidebar.markdown("**Calibrated from SPY (2000 - present)**")
+st.sidebar.markdown(f"**Calibrated from {ticker} (2000 - present)**")
 st.sidebar.markdown(f"- Annual return (mu): `{mu:.4f}`")
 st.sidebar.markdown(f"- Annual volatility (sigma): `{sigma:.4f}`")
 
@@ -98,8 +127,8 @@ col3.metric(
 
 years = np.arange(balances.shape[0])
 fig, ax = plt.subplots(figsize=(12, 6))
-fig.patch.set_color('#0e1117')
-ax.set_facecolor('#0e1117')
+fig.patch.set_color("#0e1117")
+ax.set_facecolor("#0e1117")
 
 for i in range(200):
     plt.plot(years, balances[:, i] / 1e6, color="steelblue", alpha=0.1)
@@ -136,13 +165,13 @@ ax.plot(
 
 ax.axvline(x=years_to_retirement, color="yellow", linestyle=":", label="Retirement")
 
-ax.set_xlabel('Year', color='white')
-ax.set_ylabel('Balance ($M)', color='white')
-ax.tick_params(colors='white')
+ax.set_xlabel("Year", color="white")
+ax.set_ylabel("Balance ($M)", color="white")
+ax.tick_params(colors="white")
 
-ax.legend(facecolor='#1e1e1e', labelcolor='white')
+ax.legend(facecolor="#1e1e1e", labelcolor="white")
 
 for spine in ax.spines.values():
-    spine.set_edgecolor('#333333')
+    spine.set_edgecolor("#333333")
 
 st.pyplot(fig)
