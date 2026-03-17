@@ -15,7 +15,7 @@ DEFAULTS = {
     "years_to_retirement": 30,
     "years_in_retirement": 25,
     "annual_withdrawal": 20000,
-    'n_simulations': 10000
+    "n_simulations": 10000,
 }
 
 for key, value in DEFAULTS.items():
@@ -49,7 +49,7 @@ start_date = st.sidebar.date_input(
     "Calibrated From Date",
     key="start_date",
     min_value=dt.date(1990, 1, 1),
-    max_value=dt.date.today(),
+    max_value=dt.date.today() - dt.timedelta(days=365),
 )
 
 starting_balance = st.sidebar.slider(
@@ -91,11 +91,11 @@ annual_withdrawal = st.sidebar.slider(
 )
 
 n_simulations = st.sidebar.slider(
-    'Number of Simulations',
+    "Number of Simulations",
     min_value=10000,
     max_value=100000,
-    key='n_simulations',
-    step=5000
+    key="n_simulations",
+    step=5000,
 )
 
 with st.spinner(f"Loading data for {ticker}..."):
@@ -121,7 +121,7 @@ balances = run_simulation(
 
 st.sidebar.markdown("---")
 
-if st.sidebar.button("Reset to Default"):
+if st.sidebar.button("Reset to default"):
     for key, value in DEFAULTS.items():
         if key in st.session_state:
             del st.session_state[key]
