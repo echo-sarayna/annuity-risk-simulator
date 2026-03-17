@@ -2,7 +2,7 @@
 
 An interactive retirement risk simulator built with Python and Streamlit. Pulls real historical market data from Yahoo Finance, calibrates return assumptions from a user-selected stock and date range, and runs a configurable number of simulated retirement savings paths using Geometric Brownian Motion (GBM).
 
-![Main Page](images/main_page.png)
+![Main Page](images/main_page.jpeg)
 
 ## What it does
 
@@ -13,7 +13,7 @@ Given a set of personal financial inputs, the simulator models thousands of poss
 - **Median Final Balance** - the predicted median savings at the end of the retirement period
 
 ## How to use it
-![Sidebar](images/sidebar.png)
+![Sidebar](images/sidebar.jpeg)
 
 Adjust the parameters in the sidebar on the lefthand side. Adjustable parameters include:
 
