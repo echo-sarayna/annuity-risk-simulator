@@ -6,11 +6,6 @@ from src.data import load_params
 from src.simulation import run_simulation, search_tickers
 from src.plotting import plot_paths
 
-st.set_page_config(page_title="Retirement Simulator", layout="wide")
-st.title("Retirement Simulator")
-st.caption(
-    "Simulates 10,000 retirement savings paths using real market data, following Geometric Brownian Motion."
-)
 
 DEFAULTS = {
     "ticker": "SPY",
@@ -27,6 +22,12 @@ for key, value in DEFAULTS.items():
     # save defaults in session state if user has NOT adjusted sliders
     if key not in st.session_state:
         st.session_state[key] = value
+
+st.set_page_config(page_title="Retirement Simulator", layout="wide")
+st.title("Retirement Simulator")
+st.caption(
+    f"Simulates {st.session_state['n_simulations']:,} retirement savings paths using real market data, following Geometric Brownian Motion."
+)
 
 st.sidebar.header("Parameters")
 
