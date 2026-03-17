@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import plotly.graph_objects as go
 import streamlit as st
 
 PATH_COLOR = "#7DCFCF"
@@ -16,9 +17,7 @@ def plot_paths(balances, years_to_retirement, path_color="#7DCFCF", median_color
     fig.patch.set_color("#0A2E2E")
     ax.set_facecolor("#0D3D3D")
 
-    for i in range(200):
-        plt.plot(years, balances[:, i] / 1e6, color=path_color, alpha=0.1)
-
+    ax.plot(years, balances[:, ::10] / 1e6, color=path_color, alpha=0.1, linewidth=0.5)
     # plot median path
     ax.plot(
         years,

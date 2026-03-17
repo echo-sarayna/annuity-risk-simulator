@@ -1,9 +1,8 @@
 import streamlit as st
 import numpy as np
-import matplotlib.pyplot as plt
-import yfinance as yf
+import datetime as dt
 
-from src.data import get_market_params
+from src.data import load_params
 from src.simulation import run_simulation, search_tickers
 from src.plotting import plot_paths
 
@@ -14,23 +13,22 @@ st.caption(
 )
 
 DEFAULTS = {
-    "ticker": "S&P 500",
+    "ticker": "SPY",
+    "start_date": dt.date(2000, 1, 1),
     "starting_balance": 10000,
     "annual_contribution": 10000,
     "years_to_retirement": 30,
     "years_in_retirement": 25,
     "annual_withdrawal": 20000,
+    'n_simulations': 10000
 }
 
 for key, value in DEFAULTS.items():
     # save defaults in session state if user has NOT adjusted sliders
     if key not in st.session_state:
-        print(f"{key} not in defsult")
         st.session_state[key] = value
 
-
 st.sidebar.header("Parameters")
-
 
 search_query = st.sidebar.text_input(
     "Search for a stock", key="ticker", placeholder="Apple, Tesla, SPY..."
@@ -42,10 +40,16 @@ if not options:
     st.sidebar.warning("No results found. Please try a different search.")
     st.stop()
 
-selected = st.sidebar.selectbox("Select ticker", options=options)
+selected = st.sidebar.selectbox("Select stock", options=options)
 
 ticker = selected.split(" - ")[0].strip()
 
+start_date = st.sidebar.date_input(
+    "Calibrated From Date",
+    key="start_date",
+    min_value=dt.date(1990, 1, 1),
+    max_value=dt.date.today(),
+)
 
 starting_balance = st.sidebar.slider(
     "Starting Balance ($)",
@@ -85,21 +89,21 @@ annual_withdrawal = st.sidebar.slider(
     format="$%d",
 )
 
-
-@st.cache_data
-def load_params(ticker="SPY"):
-    return get_market_params(f"{ticker}", start="2000-01-01")
-
+n_simulations = st.sidebar.slider(
+    'Number of Simulations',
+    min_value=10000,
+    max_value=100000,
+    key='n_simulations',
+    step=5000
+)
 
 with st.spinner(f"Loading data for {ticker}..."):
-    mu, sigma = load_params(ticker)
+    mu, sigma = load_params(ticker, start=start_date.strftime("%Y-%m-%d"))
 
-
-mu, sigma = load_params(ticker)
+mu, sigma = load_params(ticker, start=start_date.strftime("%Y-%m-%d"))
 
 st.sidebar.markdown("---")
 
-st.sidebar.markdown(f"**Calibrated from {ticker} (2000 - present)**")
 st.sidebar.markdown(f"- Annual return (mu): `{mu:.4f}`")
 st.sidebar.markdown(f"- Annual volatility (sigma): `{sigma:.4f}`")
 
@@ -111,9 +115,8 @@ balances = run_simulation(
     annual_withdrawal=annual_withdrawal,
     mu=mu,
     sigma=sigma,
-    n=10000,
+    n=n_simulations,
 )
-
 
 st.sidebar.markdown("---")
 
@@ -122,7 +125,6 @@ if st.sidebar.button("Reset to Default"):
         if key in st.session_state:
             del st.session_state[key]
     st.rerun()
-
 
 final_balances = balances[-1]
 at_retirement = balances[years_to_retirement]
@@ -150,10 +152,4 @@ col3.metric(
     help="Median savings balance at end of retirement",
 )
 
-PATH_COLOR = "#7DCFCF"
-MEDIAN_COLOR = "#FFFFFF"
-LOW_COLOR = "#FF4D8D"
-HIGH_COLOR = "#00FFB3"
-RETIRE_COLOR = "#FF9A5C"
-
-plot_paths(balances, years_to_retirement, PATH_COLOR, MEDIAN_COLOR, LOW_COLOR, HIGH_COLOR, RETIRE_COLOR)
+plot_paths(balances, years_to_retirement)

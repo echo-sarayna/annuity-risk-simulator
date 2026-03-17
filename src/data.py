@@ -3,6 +3,9 @@ import yfinance as yf
 
 TRADING_DAYS_IN_YEAR = 252
 
+def load_params(ticker="SPY", start="2000-01-01"):
+    return get_market_params(f"{ticker}", start=start)
+
 def get_market_params(ticker="SPY", start="2000-01-01"):
     data = yf.download(ticker, start, progress=False)
     data.columns = data.columns.get_level_values(0)
@@ -13,5 +16,5 @@ def get_market_params(ticker="SPY", start="2000-01-01"):
     mu = float(log_returns.mean() * TRADING_DAYS_IN_YEAR)
     # annualized standard deviation
     sigma = float(log_returns.std() * np.sqrt(TRADING_DAYS_IN_YEAR))
-    
+
     return mu, sigma
