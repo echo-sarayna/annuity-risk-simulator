@@ -20,7 +20,7 @@ Adjust the parameters in the sidebar:
 
 <table>
   <tr>
-    <td><img src="images/sidebar.jpg" width="500"/></td>
+    <td><img src="images/sidebar.jpg" width="500px"/></td>
     <td>
       <ul>
         <li style="margin-top: 50px; margin-bottom: 30px"><b>Stock</b> - the asset used to calibrate return assumptions. Search by company name or ticker symbol. Any asset available on Yahoo Finance is supported. Default is SPY.</li>
