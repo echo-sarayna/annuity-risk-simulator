@@ -18,7 +18,7 @@ https://github.com/user-attachments/assets/de995b3d-a1da-48d0-89c2-1e23dbfe2e4c
 
 Adjust the parameters in the sidebar:
 
-<table>
+<table border="0" cellspacing="0" cellpadding="0">
   <tr>
     <td><img src="images/sidebar.jpg" width="500px"/></td>
     <td>
