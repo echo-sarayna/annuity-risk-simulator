@@ -6,20 +6,24 @@ import yfinance as yf
 from simulation import get_market_params, run_simulation
 
 st.set_page_config(page_title="Retirement Simulator", layout="wide")
-st.title("Monte Carlo Retirement Simulator")
-st.caption("Simulates 10,000 retirement savings paths using real market data.")
+st.title("Retirement Simulator")
+st.caption(
+    "Simulates 10,000 retirement savings paths using real market data, following Geometric Brownian Motion."
+)
 
 DEFAULTS = {
-    "starting_balance": 50_000,
+    "ticker": "S&P 500",
+    "starting_balance": 10_000,
     "annual_contribution": 10_000,
     "years_to_retirement": 30,
     "years_in_retirement": 25,
-    "annual_withdrawal": 60_000,
+    "annual_withdrawal": 20_000,
 }
 
 for key, value in DEFAULTS.items():
     # save defaults in session state if user has NOT adjusted sliders
     if key not in st.session_state:
+        print(f"{key} not in defsult")
         st.session_state[key] = value
 
 
@@ -27,7 +31,7 @@ st.sidebar.header("Parameters")
 
 
 search_query = st.sidebar.text_input(
-    "Search for a stock", value="S&P 500", placeholder="Apple, Tesla, SPY..."
+    "Search for a stock", key="ticker", placeholder="Apple, Tesla, SPY..."
 )
 
 
@@ -57,7 +61,7 @@ starting_balance = st.sidebar.slider(
     "Starting Balance ($)",
     min_value=0,
     max_value=500000,
-    value=50000,
+    key="starting_balance",
     step=5000,
     format="$%d",
 )
@@ -66,24 +70,27 @@ annual_contribution = st.sidebar.slider(
     "Annual Contribution ($)",
     min_value=0,
     max_value=50000,
-    value=10000,
+    key="annual_contribution",
     step=1000,
     format="$%d",
 )
 
 years_to_retirement = st.sidebar.slider(
-    "Years Until Retirement", min_value=5, max_value=50, value=30
+    "Years Until Retirement",
+    min_value=5,
+    max_value=50,
+    key="years_to_retirement",
 )
 
 years_in_retirement = st.sidebar.slider(
-    "Years In Retirement", min_value=5, max_value=50, value=25
+    "Years In Retirement", min_value=5, max_value=50, key="years_in_retirement"
 )
 
 annual_withdrawal = st.sidebar.slider(
     "Annual Withdrawal ($)",
-    min_value=10000,
+    min_value=0,
     max_value=200000,
-    value=60000,
+    key="annual_withdrawal",
     step=5000,
     format="$%d",
 )
@@ -118,11 +125,12 @@ balances = run_simulation(
 )
 
 
-st.sidebar.markdown('---')
+st.sidebar.markdown("---")
 
 if st.sidebar.button("Reset to Default"):
     for key, value in DEFAULTS.items():
-        st.session_state[key] = value
+        if key in st.session_state:
+            del st.session_state[key]
     st.rerun()
 
 

@@ -31,6 +31,7 @@ def run_simulation(
     sigma,
     n=10000,
 ):
+    print('run sim')
     total_years = years_to_retirement + years_in_retirement
     # 2D array to store simulation results for n paths
     balances = np.zeros((total_years + 1, n))
