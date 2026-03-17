@@ -3,7 +3,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import yfinance as yf
 
-from simulation import get_market_params, run_simulation
+from src.data import get_market_params
+from src.simulation import run_simulation, search_tickers
+from src.plotting import plot_paths
 
 st.set_page_config(page_title="Retirement Simulator", layout="wide")
 st.title("Retirement Simulator")
@@ -13,11 +15,11 @@ st.caption(
 
 DEFAULTS = {
     "ticker": "S&P 500",
-    "starting_balance": 10_000,
-    "annual_contribution": 10_000,
+    "starting_balance": 10000,
+    "annual_contribution": 10000,
     "years_to_retirement": 30,
     "years_in_retirement": 25,
-    "annual_withdrawal": 20_000,
+    "annual_withdrawal": 20000,
 }
 
 for key, value in DEFAULTS.items():
@@ -33,18 +35,6 @@ st.sidebar.header("Parameters")
 search_query = st.sidebar.text_input(
     "Search for a stock", key="ticker", placeholder="Apple, Tesla, SPY..."
 )
-
-
-@st.cache_data
-def search_tickers(query):
-    results = yf.Search(query, max_results=6).quotes
-    options = [
-        f"{r['symbol']} - {r.get('shortname', r.get('longname', 'Unknown'))}"
-        for r in results
-        if "symbol" in r
-    ]
-    return options
-
 
 options = search_tickers(search_query)
 
@@ -160,53 +150,10 @@ col3.metric(
     help="Median savings balance at end of retirement",
 )
 
-years = np.arange(balances.shape[0])
-fig, ax = plt.subplots(figsize=(12, 6))
-fig.patch.set_color("#0e1117")
-ax.set_facecolor("#0e1117")
+PATH_COLOR = "#7DCFCF"
+MEDIAN_COLOR = "#FFFFFF"
+LOW_COLOR = "#FF4D8D"
+HIGH_COLOR = "#00FFB3"
+RETIRE_COLOR = "#FF9A5C"
 
-for i in range(200):
-    plt.plot(years, balances[:, i] / 1e6, color="steelblue", alpha=0.1)
-
-# plot median path
-ax.plot(
-    years,
-    np.percentile(balances, 50, axis=1) / 1e6,
-    color="white",
-    linewidth=2,
-    linestyle="--",
-    label="median",
-)
-
-# plot 10th percentile
-ax.plot(
-    years,
-    np.percentile(balances, 10, axis=1) / 1e6,
-    color="salmon",
-    linewidth=2,
-    linestyle="--",
-    label="10th percentile",
-)
-
-# plot 90th percentile
-ax.plot(
-    years,
-    np.percentile(balances, 90, axis=1) / 1e6,
-    color="lightgreen",
-    linewidth=2,
-    linestyle="--",
-    label="90th percentile",
-)
-
-ax.axvline(x=years_to_retirement, color="yellow", linestyle=":", label="Retirement")
-
-ax.set_xlabel("Year", color="white")
-ax.set_ylabel("Balance ($M)", color="white")
-ax.tick_params(colors="white")
-
-ax.legend(facecolor="#1e1e1e", labelcolor="white")
-
-for spine in ax.spines.values():
-    spine.set_edgecolor("#333333")
-
-st.pyplot(fig)
+plot_paths(balances, years_to_retirement, PATH_COLOR, MEDIAN_COLOR, LOW_COLOR, HIGH_COLOR, RETIRE_COLOR)
