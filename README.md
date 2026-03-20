@@ -97,7 +97,7 @@ Please use Python3 or higher. Below are the packages you'll need to run the proj
 ```zsh
 # clone and navigate to project
 git clone <your-repo-url>
-cd retirement_mc
+cd annuity-risk-simulator
 
 # create and activate virtual environment
 python -m venv venv
