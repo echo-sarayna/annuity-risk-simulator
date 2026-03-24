@@ -83,6 +83,8 @@ retirement_mc/
 
 ## Running the project
 
+To view the deployed app, visit https://retirement-risk-simulator.streamlit.app.
+
 ### Project Requirements
 Please use Python3 or higher. Below are the packages you'll need to run the project:
 
