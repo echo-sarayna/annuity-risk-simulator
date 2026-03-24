@@ -26,7 +26,7 @@ def run_simulation(
         # apply growth to last year's balance
         balances[t] = balances[t - 1] * growth
 
-        # if still working, add annual contribution
+        # if not retired, add annual contribution
         # otherwise, draw down savings
         if t <= years_to_retirement:
             balances[t] += annual_contribution
